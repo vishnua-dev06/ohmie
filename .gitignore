@@ -1,0 +1,13 @@
+node_modules/
+dist/
+work/
+test-results/
+.cache/
+.env
+.env.*
+!.env.example
+outputs/ohmie-source/
+outputs/*.zip
+playwright-report/
+test-results/
+.DS_Store
