@@ -1,97 +1,119 @@
-# Ohmie
+# Ohmie — Your Tiny Companion
 
-Ohmie is a grayscale virtual companion with a React client, an Express API, Supabase Auth/PostgreSQL, and Supabase Realtime. The project folder started empty, so this repository is a new implementation scaffold based on the supplied Ohmie prompt and the two attached visual references.
+Ohmie is a black-and-white retro pixel-art virtual companion featuring a React frontend, an Express API, Supabase Auth/PostgreSQL, and Supabase Realtime synchronization.
 
-## Run locally
+---
 
-Requirements: Node.js 20.19+ (Node 24 is recommended) and npm. To use real accounts and shared pets, install the [Supabase CLI](https://supabase.com/docs/guides/cli) and create a Supabase project.
+## Live Deployments & Repository
 
-1. Install packages from the project root:
+- **Live Production App (Vercel):** [https://ohmie-liart.vercel.app](https://ohmie-liart.vercel.app)
+- **Alternate Production Mirror:** [https://ohmie-vishnugoooo4-1455s-projects.vercel.app](https://ohmie-vishnugoooo4-1455s-projects.vercel.app)
+- **GitHub Repository:** [https://github.com/vishnua-dev06/ohmie](https://github.com/vishnua-dev06/ohmie)
 
-   ```sh
-   npm install
-   ```
+---
 
-2. Copy `apps/web/.env.example` to `apps/web/.env` and `apps/api/.env.example` to `apps/api/.env`.
-3. Set the Supabase project URL and public anon key in the web environment. Set the same URL, the anon key, and the **server-only** service-role key in the API environment. Never put the service-role key in a `VITE_` variable.
-4. Optionally set `OPENAI_API_KEY` and `OPENAI_MODEL` in `apps/api/.env` to enable server-side AI replies.
-5. Start the Vite client and API together:
+## Character & Pixel Art Design
 
-   ```sh
-   npm run dev
-   ```
+Ohmie is rendered using chunky square pixels and a restrained black, white, and gray palette:
 
-The web client runs at `http://localhost:5173`; the API runs at `http://localhost:8787`. Without Supabase credentials, Ohmie opens in clearly labeled preview mode. Preview pet actions are local to that browser, tasks and mood entries are temporary, and chat replies are examples rather than AI. Preview mode does not create or synchronize a shared pet.
+- **Body:** Friendly lightbulb-shaped glass head, threaded metal screw base with horizontal stripe banding, and cute stubby feet.
+- **Safety Helmet:** White engineer hard hat with bold black pixel outlines, segment seams, visor brim, and a prominent centered **lightning-bolt emblem** (`⚡`).
+- **Nine Distinct Expressions:**
+  - **Happy:** Arched eyes (`^ ^`), open smiling D-mouth, cheek blush pixels, floating pixel heart, radiant rays, and raised celebration arms.
+  - **Sad:** Glossy watery eyes with dual gleams, streaming tears, downturned mouth, dark scribble gloom cloud, and stress marks.
+  - **Angry:** Sharp furrowed V-brows, grimace/shouting mouth, steam puffs on both sides, anger vein mark (`💢`), and clenched fists.
+  - **Surprised:** Giant anime starry watery eyes with dual highlights, round `'O'` mouth, alert rays, double exclamation marks (`!!`), and hands up to cheeks.
+  - **Sleeping:** Peaceful curved closed eyes, calm mouth, folded hands, and floating pixel `'Zzz'`.
+  - **Excited:** Four-pointed star sparkle eyes (`★ ★`), wide open laugh, floating starbursts, and arms raised high.
+  - **Tired:** Heavy droopy eyelids, wavy sigh mouth, drooping arms, and an anime sweat drop.
+  - **Lonely:** Big wistful eyes looking down/to the side, quiet timid mouth, and a solitary floor speck.
+  - **Curious:** Asymmetrical quizzical brows, one wide eye and one squinting, one-sided smirk, hand on helmet, and a floating pixel question mark (`?`).
 
-## Supabase setup
+All character illustrations use `shape-rendering="crispEdges"` and `image-rendering: pixelated` to guarantee razor-sharp square pixels without gradients, blurs, or smoothing at any scale.
 
-For a hosted Supabase project, apply `supabase/migrations/202611080001_initial_ohmie.sql` using the CLI or SQL editor. For a local Supabase stack:
+---
+
+## Run Locally
+
+### Requirements
+- Node.js 20.19+ (Node 24 recommended)
+- npm
+
+### 1. Install dependencies
+```sh
+npm install
+```
+
+### 2. Configure environment (Optional for preview mode)
+- Copy `apps/web/.env.example` to `apps/web/.env`
+- Copy `apps/api/.env.example` to `apps/api/.env`
+
+*(Without Supabase credentials, Ohmie runs in interactive **preview mode**, storing local pet interactions, tasks, and moods in browser storage.)*
+
+### 3. Start development servers
+```sh
+npm run dev
+```
+
+- **Web Client (Vite):** [http://localhost:5173](http://localhost:5173)
+- **API Server (Express):** [http://localhost:8787](http://localhost:8787)
+  - API Health Check: [http://localhost:8787/api/health](http://localhost:8787/api/health)
+
+---
+
+## Environment Variables
+
+### Web (`apps/web/.env`)
+| Variable | Purpose |
+| --- | --- |
+| `VITE_SUPABASE_URL` | Supabase project URL |
+| `VITE_SUPABASE_ANON_KEY` | Public Supabase anon key; RLS still applies |
+| `VITE_API_BASE_URL` | Express API origin (defaults to `http://localhost:8787`) |
+
+### API (`apps/api/.env`)
+| Variable | Purpose |
+| --- | --- |
+| `PORT` | API port (defaults to `8787`) |
+| `WEB_ORIGIN` | Allowed web origin(s), comma-separated in production |
+| `SUPABASE_URL` | Supabase project URL |
+| `SUPABASE_ANON_KEY` | Public key for reference/configuration |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server-only Supabase service-role key |
+| `OPENAI_API_KEY` | Optional server-side OpenAI key for AI companion chat |
+| `OPENAI_MODEL` | Optional model name (defaults to `gpt-4o-mini`) |
+
+---
+
+## Supabase Database Setup
+
+To enable multi-user circles and shared pet synchronization:
 
 ```sh
 supabase start
 supabase db reset
 ```
 
-The migration creates profiles, shared pets, members, hashed invitations, activities, once-per-UTC-day shared rewards, private tasks, private moods, chat history, achievements, indexes, RLS policies, and transaction-safe pet RPC functions. It also adds pet state and activity tables to the Realtime publication. The backend uses the service-role key only after it validates each Supabase access token and checks pet membership.
+Or apply `supabase/migrations/202611080001_initial_ohmie.sql` in your hosted Supabase SQL editor. The schema includes:
+- Profiles, shared pets, circle memberships, and hashed expiring invitations
+- Realtime pet state and activity pub/sub
+- Row-Level Security (RLS) policies ensuring personal tasks, mood journals, and private chats are accessible only to their creator
+- Transaction-safe pet action RPC functions with row locking and idempotent action IDs
 
-In Supabase Auth settings, set the site URL and allowed redirect URL to your deployed web origin. Email confirmation is enabled in the local Supabase config; configure your production email provider before inviting real users.
+---
 
-## Environment variables
-
-### Web (`apps/web/.env`)
-
-| Variable | Purpose |
-| --- | --- |
-| `VITE_SUPABASE_URL` | Supabase project URL |
-| `VITE_SUPABASE_ANON_KEY` | Public Supabase anon key; RLS still applies |
-| `VITE_API_BASE_URL` | Express API origin, such as `http://localhost:8787` |
-
-### API (`apps/api/.env`)
-
-| Variable | Purpose |
-| --- | --- |
-| `PORT` | API port; defaults to `8787` |
-| `WEB_ORIGIN` | Allowed web origin(s), comma-separated in production |
-| `SUPABASE_URL` | Supabase project URL |
-| `SUPABASE_ANON_KEY` | Public key for reference/configuration |
-| `SUPABASE_SERVICE_ROLE_KEY` | Server-only Supabase key; never expose to the browser |
-| `OPENAI_API_KEY` | Optional server-side OpenAI key |
-| `OPENAI_MODEL` | Optional model name; defaults to `gpt-4o-mini` |
-
-No credentials or deployment URLs are included in this project.
-
-## Features in this scaffold
-
-- Auth dialog with email registration, sign-in, sign-out, and password reset/update flow.
-- Home dashboard with one reusable Ohmie SVG character, nine expressions, animated reactions, meters, tasks, and activity.
-- Task creation, editing, completion, deletion, deadlines, priorities, and a weekly completion view.
-- Private mood check-ins and journal notes, with recent mood visualization.
-- AI chat through the API; when OpenAI is not configured, it says so and uses a labeled preview response.
-- Pet interaction, memory matching, energy catcher, and a shared daily reward.
-- Invitation links/codes, member list, owner role changes, member removal, and leaving a pet.
-- PostgreSQL-backed concurrency control: pet-row locking, server timestamps, unique action IDs, and duplicate prevention.
-- Realtime pet updates and shared activity; reconnecting clients reload canonical pet state.
-- Browser reminders for task deadlines, daily check-ins, and shared activity after notification permission is granted. Reminders run while the app is open; this scaffold does not include background push delivery.
-- Architecture page, grayscale light/dark settings, responsive layout, and accessible labels.
-
-Personal tasks, journal text, and chat history are scoped to the authenticated user. The mood journal is never included in shared pet data. Offline pet actions are not presented as synced and are not queued; retry after reconnecting. The shared database remains the source of truth.
-
-## Checks
+## Quality & Test Checks
 
 ```sh
-npm run typecheck
-npm run build
-npm test
-npx playwright install chromium
-npm run test:e2e
+npm run typecheck    # TypeScript verification across web and api workspaces
+npm test             # Vitest component tests & API security tests
+npm run build        # Production builds for Vite client and Express API
 ```
 
-The automated suite covers the nine Ohmie states, a dashboard pet action, invitation-code hashing/generation, dashboard navigation, and a narrow-screen navigation check. Running the two-physical-device scenario still requires configured Supabase credentials and two real user accounts. Once configured, create a pet on one account, join from a second browser/device, then feed/play on alternating devices and confirm both the pet row and activity timeline update. Also verify that a non-member receives `403` and cannot read the private task, mood, or chat tables through the anon key.
+---
 
-## Deployment
+## Deployment Configuration
 
-- **Web:** Vercel can build from the repository root using `vercel.json`. Set `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, and `VITE_API_BASE_URL` in the Vercel project.
-- **API:** `render.yaml` defines an Express service rooted at `apps/api`. Set `WEB_ORIGIN`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, and optional `OPENAI_API_KEY`/`OPENAI_MODEL` in Render. Set `VITE_API_BASE_URL` in Vercel to the deployed API origin.
-- **Database/Auth:** apply the migration to Supabase and configure the production Auth redirect URLs and email provider.
-
-Before opening the app to users, configure credentials, apply the migration, run the two-account synchronization/security check, and complete the host-specific domain and email setup.
+- **Vercel (Web):**
+  - Configured in `vercel.json` with SPA routing rewrites (`/(.*) -> /index.html`) and output directory `apps/web/dist`.
+  - Continuous deployment is enabled on branch `main`. Any push to GitHub automatically triggers a new production build.
+- **Render (API):**
+  - Defined in `render.yaml` for the Express service in `apps/api`.
