@@ -55,6 +55,7 @@ async function ensurePetMember(petId: string, userId: string) {
   return data;
 }
 
+app.get('/', (_req, res) => res.json({ name: 'Ohmie API', status: 'ok', health: '/api/health', mode: hasSupabase ? 'connected' : 'preview' }));
 app.get('/api/health', (_req, res) => res.json({ status: 'ok', mode: hasSupabase ? 'connected' : 'preview', ai: Boolean(process.env.OPENAI_API_KEY) }));
 
 app.get('/api/pets/current', requireSupabase, authenticate, async (req, res, next) => {
